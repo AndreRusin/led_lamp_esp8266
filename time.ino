@@ -59,9 +59,6 @@ void timeTick()
       thisDay -= 2;
       thisTime = hour(currentLocalTime) * 60 + minute(currentLocalTime);
       uint32_t thisFullTime = hour(currentLocalTime) * 3600 + minute(currentLocalTime) * 60 + second(currentLocalTime);
-
-      printTime(thisTime, false, ONflag);                                 // проверка текущего времени и его вывод (если заказан и если текущее время соответстует заказанному расписанию вывода)
-
       // проверка рассвета
       if (alarms[thisDay].State &&                                                                                          // день будильника
           thisTime >= (uint16_t)constrain(alarms[thisDay].Time - pgm_read_byte(&dawnOffsets[dawnMode]), 0, (24 * 60)) &&    // позже начала
@@ -96,13 +93,6 @@ void timeTick()
           FastLED.show();
           dawnFlag = true;
         }
-
-        #if defined(ALARM_PIN) && defined(ALARM_LEVEL)                    // установка сигнала в пин, управляющий будильником
-        if (thisTime == alarms[thisDay].Time)                             // установка, только в минуту, на которую заведён будильник
-        {
-          digitalWrite(ALARM_PIN, manualOff ? !ALARM_LEVEL : ALARM_LEVEL);// установка сигнала в зависимости от того, был ли отключен будильник вручную
-        }
-        #endif
 
         #if defined(MOSFET_PIN) && defined(MOSFET_LEVEL)                  // установка сигнала в пин, управляющий MOSFET транзистором, матрица должна быть включена на время работы будильника
         digitalWrite(MOSFET_PIN, MOSFET_LEVEL);

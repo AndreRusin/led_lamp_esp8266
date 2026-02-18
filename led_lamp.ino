@@ -121,7 +121,6 @@
   - Добавлена блокировка кнопки на лампе из android приложения; сохраняется в EEPROM память
   --- 24.10.2019
   - Добавлен вывод сигнала (HIGH/LOW - настраивается константой MOSFET_LEVEL) синхронно с включением матрицы на пин MOSFET транзистора (настраивается константой MOSFET_PIN)
-  - Добавлен вывод сигнала (HIGH/LOW - настраивается константой ALARM_LEVEL) на пин будильника (настраивается константой ALARM_PIN); сигнал подаётся в течение одной минуты, начиная со времени, на которое заведён будильник
   --- 02.11.2019
   - Добавлен переход на летнее/зимнее время (изменены настройки часового пояса, см. Constants.h); добавлена библиотека Timezone
   - Добавлен эффект Белый огонь
@@ -150,10 +149,14 @@
 #include <EEPROM.h>
 #include "Types.h"
 #include "timerMinim.h"
+#ifdef ESP_USE_IR
+#include <IRremoteESP8266.h>
+#include <IRrecv.h>
+#include <IRutils.h>
+#endif
 #ifdef ESP_USE_BUTTON
 #include <GyverButton.h>
 #endif
-#include "fonts.h"
 #ifdef USE_NTP
 #include <NTPClient.h>
 #include <Timezone.h>
@@ -193,6 +196,11 @@ timerMinim timeTimer(3000);
 bool ntpServerAddressResolved = false;
 bool timeSynched = false;
 uint32_t lastTimePrinted = 0U;
+
+#ifdef ESP_USE_IR
+IRrecv irrecv(BTN_IR);
+decode_results results;
+#endif
 
 #ifdef ESP_USE_BUTTON
 GButton touch(BTN_PIN, LOW_PULL, NORM_OPEN); // для физической (не сенсорной) кнопки нужно поменять LOW_PULL на HIGH_PULL. ну и кнопку нужно ставить без резистора между находящимися рядом пинами D2 и GND
@@ -293,6 +301,10 @@ void setup()
   #endif
 
 
+  // КНОПКА
+  #if defined(ESP_USE_IR)
+    irrecv.enableIRIn();
+  #endif
   // КНОПКА
   #if defined(ESP_USE_BUTTON)
   touch.setStepTimeout(BUTTON_STEP_TIMEOUT);
@@ -472,6 +484,10 @@ void loop()
 
   #ifdef USE_NTP
   timeTick();
+  #endif
+
+  #ifdef ESP_USE_IR
+    irTick();
   #endif
 
   #ifdef ESP_USE_BUTTON

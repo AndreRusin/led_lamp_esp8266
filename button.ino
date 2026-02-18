@@ -98,36 +98,6 @@ void buttonTick()
     #endif
   }
 
-
-  // пятикратное нажатие
-  if (clickCount == 5U)                                     // вывод IP на лампу
-  {
-    if (espMode == 1U)
-    {
-      loadingFlag = true;
-      
-      #if defined(MOSFET_PIN) && defined(MOSFET_LEVEL)      // установка сигнала в пин, управляющий MOSFET транзистором, матрица должна быть включена на время вывода текста
-      digitalWrite(MOSFET_PIN, MOSFET_LEVEL);
-      #endif
-
-      while(!fillString(WiFi.localIP().toString().c_str(), CRGB::White)) { delay(1); ESP.wdtFeed(); }
-
-      #if defined(MOSFET_PIN) && defined(MOSFET_LEVEL)      // установка сигнала в пин, управляющий MOSFET транзистором, соответственно состоянию вкл/выкл матрицы или будильника
-      digitalWrite(MOSFET_PIN, ONflag || (dawnFlag && !manualOff) ? MOSFET_LEVEL : !MOSFET_LEVEL);
-      #endif
-
-      loadingFlag = true;
-    }
-  }
-
-
-  // шестикратное нажатие
-  if (clickCount == 6U)                                     // вывод текущего времени бегущей строкой
-  {
-    printTime(thisTime, true, ONflag);
-  }
-
-
   // семикратное нажатие
   if (ONflag && clickCount == 7U)                           // смена рабочего режима лампы: с WiFi точки доступа на WiFi клиент или наоборот
   {
