@@ -43,7 +43,7 @@ class OtaManager
       if (espMode != 1U)
       {
         #ifdef GENERAL_DEBUG
-        LOG.print(F("Запрос обновления по воздуху поддерживается только в режиме ESP_MODE = 1\n"));
+          LOG.print(F("Запрос обновления по воздуху поддерживается только в режиме ESP_MODE = 1\n"));
         #endif
 
         return false;

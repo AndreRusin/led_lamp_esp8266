@@ -33,13 +33,6 @@ void buttonTick()
     settChanged = true;
     eepromTimeout = millis();
     loadingFlag = true;
-
-    #if (USE_MQTT)
-    if (espMode == 1U)
-    {
-      MqttManager::needToPublish = true;
-    }
-    #endif
   }
 
 
@@ -53,13 +46,6 @@ void buttonTick()
     eepromTimeout = millis();
     FastLED.clear();
     delay(1);
-
-    #if (USE_MQTT)
-    if (espMode == 1U)
-    {
-      MqttManager::needToPublish = true;
-    }
-    #endif
   }
 
 
@@ -73,13 +59,6 @@ void buttonTick()
     eepromTimeout = millis();
     FastLED.clear();
     delay(1);
-
-    #if (USE_MQTT)
-    if (espMode == 1U)
-    {
-      MqttManager::needToPublish = true;
-    }
-    #endif
   }
 
 
@@ -183,13 +162,6 @@ void buttonTick()
   {
     startButtonHolding = false;
     loadingFlag = true;
-
-    #if (USE_MQTT)
-    if (espMode == 1U)
-    {
-      MqttManager::needToPublish = true;
-    }
-    #endif
   }
 }
 #endif

@@ -20,13 +20,6 @@ void parseUDP()
 
     char reply[MAX_UDP_BUFFER_SIZE];
     processInputBuffer(inputBuffer, reply, true);
-
-    #if (USE_MQTT)                                          // отправка ответа выполнения команд по MQTT, если разрешено
-    if (espMode == 1U)
-    {
-      strcpy(MqttManager::mqttBuffer, reply);               // разрешение определяется при выполнении каждой команды отдельно, команды GET, DEB, DISCOVER и OTA, пришедшие по UDP, игнорируются (приходят раз в 2 секунды от приложения)
-    }
-    #endif
     
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
     Udp.write(reply);
@@ -72,13 +65,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
       delay(1);
       sendCurrent(inputBuffer);
       FastLED.setBrightness(modes[currentMode].Brightness);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("BRI"), 3))
@@ -90,13 +76,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
       settChanged = true;
       eepromTimeout = millis();
       sendCurrent(inputBuffer);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("SPD"), 3))
@@ -107,13 +86,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
       settChanged = true;
       eepromTimeout = millis();
       sendCurrent(inputBuffer);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("SCA"), 3))
@@ -124,13 +96,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
       settChanged = true;
       eepromTimeout = millis();
       sendCurrent(inputBuffer);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("P_ON"), 4))
@@ -141,13 +106,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
       eepromTimeout = millis();
       changePower();
       sendCurrent(inputBuffer);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("P_OFF"), 5))
@@ -157,13 +115,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
       eepromTimeout = millis();
       changePower();
       sendCurrent(inputBuffer);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("ALM_SET"), 7))
@@ -187,14 +138,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
         sendAlarms(inputBuffer);
       }
       EepromManager::SaveAlarmsSettings(&alarmNum, alarms);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        strcpy(MqttManager::mqttBuffer, inputBuffer);
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("ALM_GET"), 7))
@@ -208,13 +151,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
       dawnMode = atoi(buff) - 1;
       EepromManager::SaveDawnMode(&dawnMode);
       sendAlarms(inputBuffer);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("DISCOVER"), 8))  // обнаружение приложением модуля esp в локальной сети
@@ -248,13 +184,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
 
       TimerManager::TimerHasFired = false;
       sendTimer(inputBuffer);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("FAV_GET"), 7))
@@ -268,13 +197,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
       FavoritesManager::SetStatus(inputBuffer);
       settChanged = true;
       eepromTimeout = millis();
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     else if (!strncmp_P(inputBuffer, PSTR("OTA"), 3))
@@ -305,14 +227,6 @@ void processInputBuffer(char *inputBuffer, char *outputBuffer, bool generateOutp
         EepromManager::SaveButtonEnabled(&buttonEnabled);
         sendCurrent(inputBuffer);
       }
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        strcpy(MqttManager::mqttBuffer, inputBuffer);
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
     else if (!strncmp_P(inputBuffer, PSTR("GBR"), 3)) // выставляем общую яркость для всех эффектов без сохранения в EEPROM, если приложение присылает такую строку
     {

@@ -17,13 +17,6 @@ void irTick()
       settChanged = true;
       eepromTimeout = millis();
       loadingFlag = true;
-
-      #if (USE_MQTT)
-        if (espMode == 1U)
-        {
-          MqttManager::needToPublish = true;
-        }
-      #endif
     }
     // выкл
     if (irCode == "0xF740BF") {
@@ -35,13 +28,6 @@ void irTick()
       settChanged = true;
       eepromTimeout = millis();
       loadingFlag = true;
-
-      #if (USE_MQTT)
-        if (espMode == 1U)
-        {
-          MqttManager::needToPublish = true;
-        }
-      #endif
     }
 
     // след эффект
@@ -53,13 +39,6 @@ void irTick()
       eepromTimeout = millis();
       FastLED.clear();
       delay(1);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     // пред эффект
@@ -71,13 +50,6 @@ void irTick()
       eepromTimeout = millis();
       FastLED.clear();
       delay(1);
-
-      #if (USE_MQTT)
-      if (espMode == 1U)
-      {
-        MqttManager::needToPublish = true;
-      }
-      #endif
     }
 
     // 6H - смена рабочего режима лампы: с WiFi точки доступа на WiFi клиент или наоборот

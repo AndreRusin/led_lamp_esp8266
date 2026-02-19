@@ -6,15 +6,11 @@
 
 uint32_t effTimer;
 
-void effectsTick()
-{
-  if (!dawnFlag)
-  {
-    if (ONflag && (millis() - effTimer >= ((currentMode < 7 || currentMode > 15) ? 256U - modes[currentMode].Speed : 50)))
-    {
+void effectsTick() {
+  if (!dawnFlag) {
+    if (ONflag && (millis() - effTimer >= ((currentMode < 7 || currentMode > 15) ? 256U - modes[currentMode].Speed : 50))) {
       effTimer = millis();
-      switch (currentMode)
-      {
+      switch (currentMode) {
         case EFF_SPARKLES:       sparklesRoutine();           break;
         case EFF_FIRE:           fireRoutine(true);           break;
 //        case EFF_WHITTE_FIRE:    fireRoutine(false);          break;
@@ -51,13 +47,10 @@ void effectsTick()
   }
 }
 
-void changePower()
-{
-  if (ONflag)
-  {
+void changePower() {
+  if (ONflag) {
     effectsTick();
-    for (uint8_t i = 0U; i < modes[currentMode].Brightness; i = constrain(i + 8, 0, modes[currentMode].Brightness))
-    {
+    for (uint8_t i = 0U; i < modes[currentMode].Brightness; i = constrain(i + 8, 0, modes[currentMode].Brightness)) {
       FastLED.setBrightness(i);
       delay(1);
       FastLED.show();
@@ -65,12 +58,9 @@ void changePower()
     FastLED.setBrightness(modes[currentMode].Brightness);
     delay(2);
     FastLED.show();
-  }
-  else
-  {
+  } else {
     effectsTick();
-    for (uint8_t i = modes[currentMode].Brightness; i > 0; i = constrain(i - 8, 0, modes[currentMode].Brightness))
-    {
+    for (uint8_t i = modes[currentMode].Brightness; i > 0; i = constrain(i - 8, 0, modes[currentMode].Brightness)) {
       FastLED.setBrightness(i);
       delay(1);
       FastLED.show();
@@ -79,24 +69,13 @@ void changePower()
     delay(2);
     FastLED.show();
   }
-
-  #if defined(MOSFET_PIN) && defined(MOSFET_LEVEL)          // установка сигнала в пин, управляющий MOSFET транзистором, соответственно состоянию вкл/выкл матрицы
-  digitalWrite(MOSFET_PIN, ONflag ? MOSFET_LEVEL : !MOSFET_LEVEL);
-  #endif
   
   TimerManager::TimerRunning = false;
   TimerManager::TimerHasFired = false;
   TimerManager::TimeToFire = 0ULL;
 
-  if (FavoritesManager::UseSavedFavoritesRunning == 0U)     // если выбрана опция Сохранять состояние (вкл/выкл) "избранного", то ни выключение модуля, ни выключение матрицы не сбрасывают текущее состояние (вкл/выкл) "избранного"
-  {
+  // если выбрана опция Сохранять состояние (вкл/выкл) "избранного", то ни выключение модуля, ни выключение матрицы не сбрасывают текущее состояние (вкл/выкл) "избранного"
+  if (FavoritesManager::UseSavedFavoritesRunning == 0U) {
       FavoritesManager::TurnFavoritesOff();
   }
-
-  #if (USE_MQTT)
-  if (espMode == 1U)
-  {
-    MqttManager::needToPublish = true;
-  }
-  #endif
 }
